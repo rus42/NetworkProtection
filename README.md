@@ -41,6 +41,37 @@ hydra -L users.txt -P pass.txt < ip-адрес > ssh
     создайте два файла: users.txt и pass.txt;
     в каждой строчке первого файла должны быть имена пользователей, второго — пароли. В нашем случае это могут быть случайные строки, но ради эксперимента можете добавить имя и пароль существующего пользователя.
 
+В логах suricata зафиксированы записи о событиях попытки подключения на хост по 22 порту
+
+```java
+08/13/2023-11:00:25.949286  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 192.168.1.2:51474 -> 192.168.1.1:22
+```
+
+В логах fail2ban зафиксированы записи о событиях попытки подключения на хост по 22 порту с использованием имен и паролей из файлов users.txt и pass.txt. Также фиксируются события о превышении допустимого количества попыток аутентификации для пользователя и для такого пользователя происходит разрыв соединения.
+
+```java
+Aug 13 11:04:56 vm1 sshd[2506]: Failed password for invalid user 123456789 from 192.168.1.2 port 42734 ssh2
+Aug 13 11:04:56 vm1 sshd[2505]: Failed password for invalid user 123456789 from 192.168.1.2 port 42730 ssh2
+Aug 13 11:04:56 vm1 sshd[2507]: Failed password for invalid user 123456789 from 192.168.1.2 port 42736 ssh2
+Aug 13 11:04:56 vm1 sshd[2508]: Failed password for invalid user 123456789 from 192.168.1.2 port 42740 ssh2
+Aug 13 11:04:56 vm1 sshd[2506]: pam_unix(sshd:auth): check pass; user unknown
+Aug 13 11:04:56 vm1 sshd[2505]: pam_unix(sshd:auth): check pass; user unknown
+Aug 13 11:04:56 vm1 sshd[2507]: pam_unix(sshd:auth): check pass; user unknown
+Aug 13 11:04:56 vm1 sshd[2508]: pam_unix(sshd:auth): check pass; user unknown
+Aug 13 11:04:58 vm1 sshd[2506]: Failed password for invalid user 123456789 from 192.168.1.2 port 42734 ssh2
+Aug 13 11:04:58 vm1 sshd[2505]: Failed password for invalid user 123456789 from 192.168.1.2 port 42730 ssh2
+Aug 13 11:04:58 vm1 sshd[2507]: Failed password for invalid user 123456789 from 192.168.1.2 port 42736 ssh2
+Aug 13 11:04:58 vm1 sshd[2508]: Failed password for invalid user 123456789 from 192.168.1.2 port 42740 ssh2
+Aug 13 11:04:58 vm1 sshd[2506]: error: maximum authentication attempts exceeded for invalid user 123456789 from 192.168.1.2 port 42734 ssh2 [preauth]
+Aug 13 11:04:58 vm1 sshd[2506]: Disconnecting invalid user 123456789 192.168.1.2 port 42734: Too many authentication failures [preauth]
+```
+
+В случае если в используемых файлах users.txt и pass.txt присутствует информация о существуещем логине и пароле, то в логе fail2ban зафиксировано событие об успешном подключении
+
+```java
+Aug 13 11:13:04 vm1 sshd[2811]: Accepted password for netology from 192.168.1.2 port 53310 ssh2
+Aug 13 11:13:04 vm1 sshd[2811]: pam_unix(sshd:session): session opened for user netology(uid=1000) by (uid=0)
+```
 
     Включение защиты SSH для Fail2Ban:
 
