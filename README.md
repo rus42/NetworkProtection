@@ -78,3 +78,7 @@ Aug 13 11:13:04 vm1 sshd[2811]: pam_unix(sshd:session): session opened for user 
     открыть файл /etc/fail2ban/jail.conf,
     найти секцию ssh,
     установить enabled в true.
+
+После включения защиты SSH сервера от перебора паролей на атакующем хосте получено сообщение о недоступности атакуемого порта, т.е. его блокировке на атакуемом хосте.
+
+![alt text](https://github.com/rus42/NetworkProtection/blob/main/Task_2.png)
